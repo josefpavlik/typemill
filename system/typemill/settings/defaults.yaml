@@ -16,6 +16,7 @@ formats:
   - 'notice'
   - 'image'
   - 'video'
+  - 'audio'
   - 'file'
   - 'toc'
   - 'hr'

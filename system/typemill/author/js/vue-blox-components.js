@@ -2640,6 +2640,299 @@ bloxeditor.component('video-component', {
 	}
 })
 
+bloxeditor.component('audio-component', {
+	props: ['markdown', 'disabled', 'index'],
+	components: {
+		medialib: medialib
+	},
+	template: `<div class="dropbox">
+				<input type="hidden" ref="markdown" :value="markdown" :disabled="disabled" @input="updatemarkdown" />
+				<div class="flex">
+					<div class="imageupload relative w-1/2 border-r border-dotted border-stone-700">
+						<input type="file"  name="file" accept="audio/mpeg, audio/ogg" class="opacity-0 w-full h-24 absolute cursor-pointer z-10" @change="onFileChange( $event )" />
+						<p class="text-center p-6">
+							<svg class="icon icon-upload">
+								<use xlink:href="#icon-upload"></use>
+							</svg> 
+							{{ $filters.translate('upload audio') }}
+						</p>
+					</div>
+					<button class="imageselect w-1/2 text-center p-6" @click.prevent="openmedialib('files')">
+						<svg class="icon icon-paperclip baseline">
+							<use xlink:href="#icon-paperclip"></use>
+						</svg> 
+						{{ $filters.translate('select from medialib') }}
+					</button>
+				</div>
+
+				<Transition name="initial" appear>
+					<div v-if="showmedialib" class="fixed top-0 left-0 right-0 bottom-0 bg-stone-100 z-50">
+						<button class="w-full bg-stone-200 hover:bg-rose-500 hover:text-white p-2 transition duration-100" @click.prevent="showmedialib = false">{{ $filters.translate('close library') }}</button>
+						<medialib parentcomponent="files" @addFromMedialibEvent="addFromMedialibFunction"></medialib>
+					</div>
+				</Transition>
+
+				<div class="absolute top-3 -left-5 text-stone-400">
+					<svg class="icon icon-paperclip">
+						<use xlink:href="#icon-paperclip"></use>
+					</svg>
+				</div>
+				<div v-if="load" class="loadwrapper"><span class="load"></span></div>
+				<div class="imgmeta p-8" v-if="filemeta">
+					<input 
+						title 		= "fileid" 
+						type 		= "hidden" 
+						placeholder = "id" 
+						v-model 	= "fileid" 
+						@input 		= "createmarkdown" 
+						max 		= "140" 
+						/>
+					<div class="flex mb-2">
+						<label class="w-1/5 py-2" for="path">{{ $filters.translate('Path') }}: </label>
+						<input class="w-4/5 p-2 bg-stone-200 text-stone-900" name="path" type="text" readonly="true" v-model="fileurl" />
+					</div>
+					<div class="flex mb-2">
+						<label class="w-1/5 py-2" for="width">{{ $filters.translate('Width') }}: </label>
+						<input class="w-4/5 p-2 bg-stone-200 text-stone-900" name="width" type="text" placeholder="500" v-model="width" @input="createmarkdown" />
+					</div>					
+					<div class="flex mb-2">
+					    <label class="w-1/5 py-2" for="videopreload">{{ $filters.translate('Preload') }}: </label>
+					    <select class="w-4/5 p-2 bg-stone-200 text-stone-900" name="videopreload" v-model="preload" @change="createmarkdown">
+					        <option value="none">none</option>
+					        <option value="metadata">metadata</option>
+					        <option value="auto">auto</option>
+					    </select>
+					</div>
+				</div>
+  			</div>`,
+	data: function(){
+		return {
+			maxsize: 100, // megabyte
+			showmedialib: false,
+			load: false,
+			filemeta: false,
+			fileextension: '',
+			allowedExtensions: ['mp3', 'ogg'],
+			fileurl: '',
+			width: '500px',			
+			fileid: '',
+			savefile: false,
+			preload: 'none',
+		}
+	},
+	mounted: function() {
+	    eventBus.$on('beforeSave', this.beforeSave);
+
+	    this.$refs.markdown.focus();
+
+	    if (this.markdown) 
+	    {
+	        this.filemeta = true;
+
+	        var fileurl = this.markdown.match(/path="(.*?)"/);
+	        if (fileurl && fileurl[1]) 
+	        {
+	            this.fileurl = fileurl[1];
+	        }
+
+	        var width = this.markdown.match(/width="(.*?)"/);
+	        if (width && width[1]) 
+	        {
+	            this.width = width[1];
+	        } 
+
+	        var preload = this.markdown.match(/preload="(.*?)"/);
+	        if (preload && preload[1]) 
+	        {
+	            this.preload = preload[1];
+	        } 
+	    }
+	},
+	methods: {
+		addFromMedialibFunction(file)
+		{
+		    this.showmedialib  = false;
+		    this.savefile      = false;
+		    this.filemeta      = true;
+
+			if (this.allowedExtensions.includes(file.info.extension.toLowerCase()))
+		    {
+		        this.filetitle    = file.name;
+		        this.fileextension = file.info.extension.toLowerCase();
+		        this.fileurl       = file.url;
+		    }
+		    else 
+		    {
+		        let message = "Unsupported file type. Please select a valid audio file (mp3, ogg).";
+		        eventBus.$emit('publishermessage', message);
+		        return;
+		    }
+
+		    this.createmarkdown();
+		},
+		openmedialib()
+		{
+			this.showmedialib = true;
+		},
+		isChecked(classname)
+		{
+			if(this.fileclass == classname)
+			{
+				return ' checked';
+			}
+		},
+		updatemarkdown(event, url)
+		{
+			this.$emit('updateMarkdownEvent', event.target.value);
+		},
+		createmarkdown()
+		{
+		    var errors = false;
+		    var filemarkdown = false;
+
+		    if (this.fileurl !== '')
+		    {
+		        if (this.fileurl.length < 101)
+		        {
+		            var width 	= this.width ? ' width="' + this.width + '"' : '';
+		            var preload = this.preload ? ' preload="' + this.preload + '"' : ' preload="none"';
+
+		            filemarkdown = '[:audio path="' + this.fileurl + '"' + width + preload + ' :]';
+		        } 
+		        else 
+		        {
+		            errors = this.$filters.translate('Maximum size of file link is 100 characters');
+		        }
+		    }
+
+		    if (errors) 
+		    {
+		        eventBus.$emit('publishermessage', this.$filters.translate(errors));
+		    } 
+		    else if (filemarkdown) 
+		    {
+		        this.$emit('updateMarkdownEvent', filemarkdown);
+		        this.compmarkdown = filemarkdown;
+		    }
+		},
+		onFileChange( e )
+		{
+			if(e.target.files.length > 0)
+			{
+				let uploadedFile = e.target.files[0];
+
+		        let allowedAudioTypes = ['audio/mpeg', 'audio/ogg'];
+		        if (!allowedAudioTypes.includes(uploadedFile.type)) {
+		            let message = "Unsupported file type. Please select an audio file (mp3, ogg).";
+		            eventBus.$emit('publishermessage', message);
+		            return;
+		        }
+
+				let size = uploadedFile.size / 1024 / 1024;
+				
+				if (size > this.maxsize)
+				{
+					let message = "The maximal size of a file is " + this.maxsize + " MB";
+					eventBus.$emit('publishermessage', message);
+					return;
+				}
+				else
+				{
+					self = this;
+					
+					self.load = true;
+
+					let reader = new FileReader();
+					reader.readAsDataURL(uploadedFile);
+					reader.onload = function(e) {
+						
+						tmaxios.post('/api/v1/file',{
+							'url':				data.urlinfo.route,
+							'file':				e.target.result,
+							'name': 			uploadedFile.name, 
+						})
+						.then(function (response) {
+
+							self.load = false;
+
+							self.filemeta 			= true;
+							self.savefile 			= true;
+							self.filetitle 			= response.data.fileinfo.title;
+							self.fileextension 		= response.data.fileinfo.extension;
+							self.fileurl 			= response.data.filepath;
+							self.selectedrole 		= '';
+							
+							self.createmarkdown();
+				    	})
+						.catch(function (error)
+						{
+							self.load = false;
+							if(error.response)
+							{
+								let message = self.$filters.translate(error.response.data.message);
+								eventBus.$emit('publishermessage', message);
+							}
+						});
+					}
+				}
+			}
+		},
+		beforeSave()
+		{
+			/* publish file before you save markdown */
+
+			if(!this.fileurl)
+			{
+				let message = this.$filters.translate('file is missing.');
+				eventBus.$emit('publishermessage', message);
+
+				return;
+			}
+
+		    const fileExtension = this.fileurl.split('.').pop().toLowerCase();
+
+		    if (!this.allowedExtensions.includes(fileExtension))
+		    {
+		        let message = this.$filters.translate('Unsupported file format. Only MP3, and OGG files are allowed.');
+		        eventBus.$emit('publishermessage', message);
+		        
+		        return;
+		    }
+
+			if(!this.savefile)
+			{
+				this.createmarkdown();
+				this.$emit('saveBlockEvent');
+			}
+			else
+			{
+				var self = this;
+
+		        tmaxios.put('/api/v1/file',{
+					'url':			data.urlinfo.route,
+					'file': 		this.fileurl,
+				})
+				.then(function (response)
+				{
+					self.fileurl = response.data.path;
+
+					self.createmarkdown();
+
+					self.$emit('saveBlockEvent');
+				})
+				.catch(function (error)
+				{
+					if(error.response)
+					{
+						let message = self.$filters.translate(error.response.data.message);
+						eventBus.$emit('publishermessage', message);
+					}
+				});
+			}
+		},		
+	}
+})
+
 bloxeditor.component('shortcode-component', {
 	props: ['markdown', 'disabled', 'index'],
 	data: function(){

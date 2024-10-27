@@ -74,6 +74,13 @@ const determiner = {
 		}
 		return false;
 	},
+	audio: function(block,lines,firstChar,secondChar,thirdChar){
+		if (lines[0].startsWith('[:audio'))
+		{
+		    return "audio-component";
+		}
+		return false;
+	},
 	code: function(block,lines,firstChar,secondChar,thirdChar){
 		if( firstChar == '`' && secondChar == '`' && thirdChar == '`')
 		{
@@ -114,6 +121,7 @@ const bloxFormats = {
 			notice: { label: '<svg class="icon icon-exclamation-circle"><use xlink:href="#icon-exclamation-circle"></use></svg>', title: 'Notice', component: 'notice-component' },
 			image: { label: '<svg class="icon icon-image"><use xlink:href="#icon-image"></use></svg>', title: 'Image', component: 'image-component' },
 			video: { label: '<svg class="icon icon-film"><use xlink:href="#icon-film"></use></svg>', title: 'Video', component: 'video-component' },
+			audio: { label: '<svg class="icon icon-music"><use xlink:href="#icon-music"></use></svg>', title: 'Audio', component: 'audio-component' },
 			file: { label: '<svg class="icon icon-paperclip"><use xlink:href="#icon-paperclip"></use></svg>', title: 'File', component: 'file-component' },
 			toc: { label: '<svg class="icon icon-list-alt"><use xlink:href="#icon-list-alt"></use></svg>', title: 'Table of Contents', component: 'toc-component' },
 			hr: { label: '<svg class="icon icon-pagebreak"><use xlink:href="#icon-pagebreak"></use></svg>', title: 'Horizontal Line', component: 'hr-component' },

@@ -126,6 +126,7 @@ fieldsetwriting:
         'notice': 'notice'
         'image': 'image'
         'video': 'video'
+        'audio': 'audio'
         'file': 'file'
         'toc': 'table of contents'
         'hr': 'horizontal line'
