@@ -507,6 +507,7 @@ class Media
 		}
 
 		$extension 		= $this->getExtension();
+		$origExtension 	= $extension;
 		$originalName 	= $this->getFilename();
 		$originalFile 	= $originalName . '.' . $extension;
 		$customName 	= $forcename ? $forcename . $resizeName : $originalName . $resizeName;
@@ -529,12 +530,17 @@ class Media
 		{
 			$imagePath = $storage->getFolderPath('originalFolder') . $originalFile;
 		}
+		elseif($origExtension = $this->findImageWithName($originalName, $storage))
+		{
+			$originalFile = $originalName . '.' . $origExtension;
+			$imagePath = $storage->getFolderPath('originalFolder') . $originalFile;
+		}
 		else
 		{
 			return 'image not found';			
 		}
 
-		$image 			= $this->createImageFromPath($imagePath, $extension);
+		$image 			= $this->createImageFromPath($imagePath, $origExtension);
 		$originalSize 	= $this->getImageSize($image);
 		$resizedImage	= $this->resizeImage($image, $desiredSize, $originalSize);
 
@@ -544,6 +550,19 @@ class Media
 		}
 
 		return 'error resizing image';
+	}
+
+	private function findImageWithName($originalName, $storage)
+	{
+		foreach($this->allowedExtensions as $extension => $bool)
+		{
+			$filename = $originalName . '.' . $extension;
+			if($storage->checkFile('originalFolder', '', $filename))
+			{
+				return $extension;
+			}
+		}
+		return false;
 	}
 
 	public function createGrayscale($imageUrl)

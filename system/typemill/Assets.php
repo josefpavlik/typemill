@@ -33,6 +33,8 @@ class Assets
 
 	public $meta;
 
+	public $media;
+
 	public $imageUrl;
 
 	public $imageFolder;
