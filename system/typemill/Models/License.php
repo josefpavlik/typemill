@@ -153,7 +153,7 @@ class License
 		$thishost 			= parse_url($urlinfo['baseurl'], PHP_URL_HOST);
 		$thishost 			= str_replace("www.", "", $thishost);
 
-		$whitelist 			= ['localhost', '127.0.0.1', 'typemilltest.', $licensehost];
+		$whitelist 			= ['localhost', '127.0.0.1', 'typemilltest.', 'try.', $licensehost];
 
 		foreach($whitelist as $domain)
 		{
@@ -177,7 +177,7 @@ class License
 		$thishost 			= preg_replace('/^www\./', '', $thishost);
 		$thishost 			= $this->extractBaseDomain($thishost);
 
-		$whitelist 			= ['localhost', '127.0.0.1', 'typemilltest.', $licensehost];
+		$whitelist 			= ['localhost', '127.0.0.1', 'typemilltest.', 'try.', $licensehost];
 
 		foreach($whitelist as $domain)
 		{
