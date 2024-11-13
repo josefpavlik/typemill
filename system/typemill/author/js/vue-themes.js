@@ -116,13 +116,26 @@ const app = Vue.createApp({
 									<div :class="messageClass" class="block w-full h-8 px-3 py-1 my-1 text-white transition duration-100">{{ message }}</div>
 									<div class="w-full mt-6 flex justify-between">
 										<button type="submit" @click.prevent="save()" class="flex-1 p-3 bg-stone-700 dark:bg-stone-600 hover:bg-stone-900 hover:dark:bg-stone-900 text-white cursor-pointer transition duration-100">Save</button>
-										<a v-if="!checkLicense(license, theme.license)" href="https://typemill.net/buy" target="_blank" class="flex-1 ml-3 p-3 py-4 text-center bg-teal-500 hover:bg-teal-600 text-white cursor-pointer transition duration-100">Buy a license</a>
+										<a v-if="!checkLicense(license, theme.license)" href="https://typemill.net/license/buy" target="_blank" class="flex-1 ml-3 p-3 py-4 text-center bg-teal-500 hover:bg-teal-600 text-white cursor-pointer transition duration-100">Buy a license</a>
 										<a v-else-if="theme.paypal" :href="theme.paypal" target="_blank" class="flex-1 ml-3 p-3 py-4 text-center bg-teal-500 hover:bg-teal-600 text-white cursor-pointer transition duration-100">Donate {{theme.amount}},-</a>
 									</div>
-								</div>
+								</div>								
 							</form>
 						</li>
 					</ul>
+					<div class="my-5 text-center">
+						<modal v-if="showModal" @close="showModal = false">
+							<template #header>
+								<h3>{{ $filters.translate('License required') }}</h3>
+							</template>
+							<template #body>
+								<p>{{ $filters.translate(modalMessage) }}</p>
+							</template>
+							<template #button>
+								<a :href="getLinkToLicense()" class="focus:outline-none px-4 p-3 mr-3 text-white bg-teal-500 hover:bg-teal-700 transition duration-100">{{ $filters.translate('Check your license') }}</a>
+							</template>
+						</modal>
+					</div>					
 				</div>
 			</Transition>`,
 	data() {
@@ -244,9 +257,9 @@ const app = Vue.createApp({
 			{
 				if(error.response)
 				{
-					self.showModal = true;
+					self.formData[themename]['active'] = false;
 					self.modalMessage = handleErrorMessage(error);
-					self.messageClass = 'bg-rose-500';
+					self.showModal = true;
 				}
 			});
 		},

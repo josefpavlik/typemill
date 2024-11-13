@@ -208,16 +208,24 @@ class License
 
 	public function checkIfTest(array $urlinfo)
 	{
-		$thishost 			= parse_url($urlinfo['baseurl'], PHP_URL_HOST);
-		$thishost 			= str_replace("www.", "", $thishost);
-		$test 				= substr($thishost, 0, 9);
+	    $thishost = parse_url($urlinfo['baseurl'], PHP_URL_HOST);
+	    $thishost = str_replace("www.", "", $thishost); // Remove "www."
 
-		if($test == 'localhost' OR $test == '127.0.0.1')
-		{
-			return true;
-		}
+	    if ($thishost === 'localhost' || $thishost === '127.0.0.1')
+	    {
+	        return true;
+	    }
 
-		return false;
+	    $subdomains = ['typemilltest.', 'try.'];
+	    foreach ($subdomains as $subdomain)
+	    {
+	        if (strpos($thishost, $subdomain) === 0)
+	        {
+	            return true;
+	        }
+	    }
+
+	    return false;
 	}
 
 	private function validateLicense($data)
