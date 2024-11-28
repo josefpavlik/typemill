@@ -1104,7 +1104,10 @@ class ParsedownExtension extends \ParsedownExtra
                 # keep empty lines in pre-tags
                 if($CurrentBlock['type'] == 'FencedCode' && isset($current['text']))
                 {
-                    $current['text'] .= "\n";
+                    # Append a newline only if it's not the last blank line in the block
+                    if (empty($CurrentBlock['complete'])) {
+                        $current['text'] .= "\n";
+                    }
                 }
                 continue;
             }
