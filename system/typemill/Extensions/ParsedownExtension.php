@@ -768,7 +768,14 @@ class ParsedownExtension extends \ParsedownExtra
         {
             if(is_array($this->allowedShortcodes) && empty($this->allowedShortcodes))
             {
-                return array('element' => array());
+                return array(
+                    'element' => array(
+                        'rawHtml' => htmlspecialchars($matches[0]), // Escape the entire shortcode
+                        'allowRawHtmlInSafeMode' => true,
+                    ),
+                    'extent' => strlen($matches[0]), // Consume the full shortcode
+                    'complete' => true, // Close the block at the end of the line.             
+                );
             }
 
             $shortcodeString     = substr($matches[0], 2, -2);
@@ -780,7 +787,14 @@ class ParsedownExtension extends \ParsedownExtra
 
             if(is_array($this->allowedShortcodes) && !in_array($shortcode['name'], $this->allowedShortcodes))
             {
-                return array('element' => array());
+                return array(
+                    'element' => array(
+                        'rawHtml' => htmlspecialchars($matches[0]), // Escape the entire shortcode
+                        'allowRawHtmlInSafeMode' => true,
+                    ),
+                    'extent' => strlen($matches[0]), // Consume the full shortcode
+                    'complete' => true, // Close the block at the end of the line.
+                );
             }
 
             $params = $this->shortcodeParams($shortcodeArray);
@@ -829,7 +843,13 @@ class ParsedownExtension extends \ParsedownExtra
         {
             if(is_array($this->allowedShortcodes) && empty($this->allowedShortcodes))
             {
-                return array('element' => array());
+                return array(
+                    'element' => array(
+                        'rawHtml' => htmlspecialchars($matches[0]), // Escape the entire shortcode
+                        'allowRawHtmlInSafeMode' => true,
+                    ),
+                    'extent' => strlen($matches[0]), // Consume the full shortcode
+                );
             }
 
             $shortcodeString     = substr($matches[0], 2, -2);
@@ -841,7 +861,13 @@ class ParsedownExtension extends \ParsedownExtra
 
             if(is_array($this->allowedShortcodes) && !in_array($shortcode['name'], $this->allowedShortcodes))
             {
-                return array('element' => array());
+                return array(
+                    'element' => array(
+                        'rawHtml' => htmlspecialchars($matches[0]), // Escape the entire shortcode
+                        'allowRawHtmlInSafeMode' => true,
+                    ),
+                    'extent' => strlen($matches[0]), // Consume the full shortcode
+                );
             }
 
             $params = $this->shortcodeParams($shortcodeArray);
