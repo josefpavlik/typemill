@@ -3012,10 +3012,33 @@ bloxeditor.component('shortcode-component', {
 		})
 		.then(function (response)
 		{
-			if(response.data.shortcodedata !== false)
+			if (response.data.shortcodedata !== false)
 			{
-				myself.shortcodedata = response.data.shortcodedata;
-				myself.parseshortcode();
+			    let cleanedShortcodes = {};
+			    
+			    for (let key in response.data.shortcodedata)
+			    {
+			        let shortcode = response.data.shortcodedata[key];
+			        
+			        /* Skip if the shortcode data is an empty array */
+			        if (Array.isArray(shortcode) && shortcode.length === 0)
+			        {
+			            continue;
+			        }
+			        
+			        /* Remove the "showInVisualEditor" key */
+			        if (typeof shortcode === 'object' && shortcode !== null)
+			        {
+			            delete shortcode.showInVisualEditor;
+			        }
+			        
+			        // Add the cleaned shortcode back if not empty
+			        cleanedShortcodes[key] = shortcode;
+			    }
+			    
+			    // Assign the cleaned shortcodedata
+ 				myself.shortcodedata = Object.keys(cleanedShortcodes).length > 0 ? cleanedShortcodes : false;
+ 			    myself.parseshortcode();
 			}
 		})
 		.catch(function (error)
