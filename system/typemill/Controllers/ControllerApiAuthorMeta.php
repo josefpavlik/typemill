@@ -130,6 +130,7 @@ class ControllerApiAuthorMeta extends Controller
 		$langattr 			= $this->settings['langattr'];
 		$navigation 		= new Navigation();
 		$item 				= $navigation->getItemForUrl($params['url'], $urlinfo, $langattr);
+
 		if(!$item)
 		{
 			$response->getBody()->write(json_encode([
@@ -234,13 +235,13 @@ class ControllerApiAuthorMeta extends Controller
 					# RECREATE ITEM AND NAVIGATION, because we rename filename first and later update the meta-content
 					$draftNavigation 	= $navigation->getFullDraftNavigation($urlinfo, $this->settings['langattr']);
 					$draftNavigation 	= $navigation->setActiveNaviItemsWithKeyPath($draftNavigation, $item->keyPathArray);
-					$item 				= $navigation->getItemWithKeyPath($draftNavigation, $item->keyPathArray);				
+					$item 				= $navigation->getItemWithKeyPath($draftNavigation, $item->keyPathArray);
 				}
 			}
 
 			# if folder has changed and contains pages instead of posts or posts instead of pages
 			if($item->elementType == "folder" && isset($params['data']['contains']) && isset($metadata['meta']['contains']) && $this->hasChanged($params['data'], $metadata['meta'], 'contains'))
-			{
+			{				
 				if($meta->folderContainsFolders($item))
 				{
 					$response->getBody()->write(json_encode([

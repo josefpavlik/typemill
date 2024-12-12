@@ -905,7 +905,7 @@ class Storage
 	##################
 
 	public function transformPagesToPosts($folder)
-	{		
+	{
 		$filetypes			= array('md', 'txt', 'yaml');
 		$result 			= true;
 
