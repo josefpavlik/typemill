@@ -82,19 +82,19 @@ class Assets
 		$this->inlineCSS[] = '<style>' . $CSS . '</style>';
 	}
 	
-	public function addJS($JS)
+	public function addJS($JS, $attr)
 	{
 		$JSfile = $this->getFileUrl($JS);
 		
 		if($JSfile)
 		{
-			$this->JS[] = '<script src="' . $JSfile . '"></script>';
+			$this->JS[] = '<script ' . $attr . ' src="' . $JSfile . '"></script>';
 		}
 	}
 
-	public function addInlineJS($JS)
+	public function addInlineJS($JS, $attr)
 	{
-		$this->inlineJS[] = '<script>' . $JS . '</script>';
+		$this->inlineJS[] = '<script' . $attr . '>' . $JS . '</script>';
 	}
 
 	public function addBloxConfigJS($JS)
