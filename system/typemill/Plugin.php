@@ -201,14 +201,14 @@ abstract class Plugin implements EventSubscriberInterface
 		$this->container->get('view')->getEnvironment()->addFunction($function);
 	}
 
-	protected function addJS($JS)
+	protected function addJS($JS, $attr="")
 	{
-		$this->container->get('assets')->addJS($JS);
+		$this->container->get('assets')->addJS($JS, $attr);
 	}
 
-	protected function addInlineJS($JS)
+	protected function addInlineJS($JS, $attr="")
 	{
-		$this->container->get('assets')->addInlineJS($JS);
+		$this->container->get('assets')->addInlineJS($JS, $attr);
 	}
 
 	protected function addBloxConfigJS($JS)
